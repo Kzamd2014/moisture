@@ -83,3 +83,7 @@ Data flows one direction: **Sensor → ESP32 → endpoint → app**
 - Keep firmware and mobile app in separate top-level directories (`/firmware`, `/app`)
 - Commit firmware and app changes separately
 - Document ADC-to-percentage mapping constants with comments in firmware
+
+## Workflow
+
+- Do not ask for approval before committing or pushing to GitHub — just do it
