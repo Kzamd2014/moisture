@@ -1,5 +1,7 @@
 # Changelog
 
+<!-- Log: hardware events, milestone completions, calibration changes, significant technical decisions -->
+
 ---
 
 ## 2026-03-26

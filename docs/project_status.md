@@ -32,7 +32,12 @@
 
 - Project scaffolded: CLAUDE.md, README.md, docs/
 - Architecture, spec, and status documented
-- Claude Code automated docs system in place (PostToolUse hook + git post-commit hook)
+
+## Infrastructure Notes
+
+- Claude Code PostToolUse hook auto-updates project_status, architecture, and project_spec when CLAUDE.md or firmware/app files change
+- Git post-commit hook auto-updates changelog.md after each commit
+- These don't affect hardware or app development — documentation maintenance only
 
 ---
 

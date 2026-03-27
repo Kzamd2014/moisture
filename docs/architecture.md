@@ -41,7 +41,7 @@ moisture = constrain(moisture, 0, 100);
 **Phase 2 — BLE Notify (added alongside HTTP, no removal)**
 - ESP32 advertises BLE GATT characteristic
 - App subscribes to notifications; ESP32 pushes on value change
-- No polling required for BLE path
+- BLE eliminates polling on the app side; HTTP endpoint remains active for debugging or alternative clients
 
 ### Mobile App Layer (React Native / Expo)
 - **Phase 1:** Expo managed workflow — polls HTTP endpoint, renders moisture %
