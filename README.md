@@ -8,8 +8,8 @@ Solo developer project. No cloud, no production deployment.
 
 ## How it works
 
-1. ESP32 reads analog output from a capacitive soil moisture sensor
-2. Raw ADC value is mapped to a 0–100% moisture percentage
+1. ESP32 reads analog output from a capacitive soil moisture sensor (ADC1, GPIO32–39)
+2. Raw ADC value is averaged across 10 samples and mapped to a 0–100% moisture percentage
 3. ESP32 serves a `GET /moisture` JSON endpoint over Wi-Fi
 4. Expo app polls the endpoint every 10 seconds and displays the live reading
 
@@ -32,9 +32,10 @@ Solo developer project. No cloud, no production deployment.
 ## Project structure
 
 ```
-/firmware   ESP32 Arduino sketch
-/app        React Native (Expo) mobile app
-/docs       Brainstorms and planning notes
+firmware/   ESP32 Arduino sketch
+app/        React Native (Expo) mobile app — Phase V1
+docs/       Hardware setup, calibration, changelog
+specs/      Speckit feature specs, plans, and tasks
 ```
 
 ---
@@ -42,9 +43,10 @@ Solo developer project. No cloud, no production deployment.
 ## Milestones
 
 ### MVP — Sensor reads over Wi-Fi
-- [ ] Sensor wired to ESP32 ADC1 pin (GPIO32–39)
-- [ ] Raw ADC mapped to 0–100% moisture
-- [ ] ESP32 HTTP server responds to `GET /moisture` with JSON
+- [x] Firmware written (`firmware/moisture/moisture.ino`)
+- [ ] Sensor wired to ESP32 ADC1 pin (GPIO32–39) — awaiting hardware
+- [ ] ADC calibration constants tuned to physical unit
+- [ ] Browser `GET http://esp32.local/moisture` returns valid JSON
 
 ### V1 — Mobile app displays live reading
 - [ ] Expo app polls `http://esp32.local/moisture` every 10 seconds
@@ -58,34 +60,46 @@ Solo developer project. No cloud, no production deployment.
 
 ---
 
-## Hardware
+## Quickstart
 
-**Wiring:** Connect sensor signal wire to an ADC1 pin (GPIO32–39). ADC2 pins are unavailable when Wi-Fi is active.
+See [`firmware/README.md`](firmware/README.md) for wiring, flash instructions, and troubleshooting.
 
-**ADC calibration constants** (update after measuring your specific unit):
-
-```cpp
-const int RAW_DRY = 2900;  // sensor in air
-const int RAW_WET  = 1200;  // sensor submerged in water
-
-int moisture = map(rawADC, RAW_DRY, RAW_WET, 0, 100);
-moisture = constrain(moisture, 0, 100);
-```
+See [`docs/hardware_setup.md`](docs/hardware_setup.md) for the ADC calibration procedure.
 
 ---
 
-## Networking
-
-The ESP32 advertises itself as `esp32.local` via mDNS. The app polls:
+## Endpoint
 
 ```
 GET http://esp32.local/moisture
 ```
 
-If mDNS fails on Android, fall back to the hardcoded IP address temporarily.
+Fallback (Android / mDNS unavailable):
 
-**Endpoint response:**
+```
+GET http://<device-ip>/moisture
+```
+
+Response:
 
 ```json
-{ "moisture": 42 }
+{"moisture_percent": 42}
+```
+
+Fault response:
+
+```json
+{"moisture_percent": 0, "error": "sensor fault: raw value out of range (4095)"}
+```
+
+---
+
+## Calibration constants
+
+Update these in `firmware/moisture/moisture.ino` after running the calibration procedure:
+
+```cpp
+const int RAW_DRY    = 2900;  // ADC reading in dry air
+const int RAW_WET    = 1200;  // ADC reading submerged in water
+const int SAMPLE_COUNT = 10;  // samples averaged per reading
 ```
