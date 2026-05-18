@@ -1,3 +1,33 @@
 .claude/
 .obsidian/
 vault/
+
+# Arduino / C++ build artifacts
+build/
+bin/
+*.o
+*.a
+*.elf
+*.bin
+*.hex
+*.map
+
+# Arduino IDE cache
+.arduino15/
+
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Credentials — never commit
+firmware/moisture/secrets.h
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.tmp

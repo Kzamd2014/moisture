@@ -51,6 +51,7 @@ Data flows one direction: **Sensor → ESP32 → endpoint → app**
 - [ ] ESP32 advertises a BLE characteristic with the moisture value
 - [ ] React Native app connects via `react-native-ble-plx` and subscribes to BLE notifications
 - [ ] Dev notes comparing Wi-Fi vs BLE approaches
+- [ ] 3D printed housing for ESP32 + sensor (optional, for permanent plant deployment)
 - **Done when:** App receives BLE notify updates without polling; Wi-Fi transport still functional
 
 ---
@@ -87,3 +88,16 @@ Data flows one direction: **Sensor → ESP32 → endpoint → app**
 ## Workflow
 
 - Do not ask for approval before committing or pushing to GitHub — just do it
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan at:
+`specs/001-mvp-wifi-http/plan.md`
+
+Supporting artifacts:
+- Spec: `specs/001-mvp-wifi-http/spec.md`
+- Research decisions: `specs/001-mvp-wifi-http/research.md`
+- Data model: `specs/001-mvp-wifi-http/data-model.md`
+- API contract: `specs/001-mvp-wifi-http/contracts/get-moisture.md`
+- Quickstart: `specs/001-mvp-wifi-http/quickstart.md`
+<!-- SPECKIT END -->
