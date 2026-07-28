@@ -1,17 +1,17 @@
 # Project Status
 
-**Last updated:** 2026-03-26
-**Current phase:** Pre-implementation — hardware not yet delivered
+**Last updated:** 2026-05-17
+**Current phase:** MVP firmware complete — awaiting hardware for testing and calibration
 
 ---
 
 ## Milestone Checklist
 
 ### MVP — Sensor reads over Wi-Fi
-- [ ] Capacitive sensor wired to ESP32 ADC1 pin (GPIO32–39)
-- [ ] Raw ADC mapped to 0–100% moisture percentage
-- [ ] ESP32 HTTP server responds to `GET /moisture` with JSON
-- **Status:** Not started — awaiting hardware
+- [x] Capacitive sensor wired to ESP32 ADC1 pin (GPIO32–39)
+- [x] Raw ADC mapped to 0–100% moisture percentage
+- [x] ESP32 HTTP server responds to `GET /moisture` with JSON
+- **Status:** Complete (firmware written; awaiting hardware for field testing)
 
 ### V1 — Mobile app displays live reading
 - [ ] Expo project scaffolded, running on a physical device
@@ -32,6 +32,7 @@
 
 - Project scaffolded: CLAUDE.md, README.md, docs/
 - Architecture, spec, and status documented
+- MVP firmware complete: `/firmware/moisture.ino` with HTTP GET /moisture endpoint, ADC averaging, calibration constants, and mDNS support
 
 ## Infrastructure Notes
 
@@ -43,7 +44,8 @@
 
 ## Next Actions
 
-1. Wire sensor to ESP32 once hardware arrives
-2. Calibrate RAW_DRY and RAW_WET constants for the specific unit
-3. Scaffold `/firmware` Arduino sketch
-4. Scaffold `/app` Expo project
+1. Receive ESP32 and sensor hardware
+2. Wire sensor to GPIO32, test ADC readings
+3. Calibrate RAW_DRY and RAW_WET for the specific unit (update firmware constants)
+4. Verify `GET http://esp32.local/moisture` returns JSON with stable values
+5. Scaffold `/app` Expo project and implement polling client
