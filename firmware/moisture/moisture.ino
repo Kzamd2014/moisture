@@ -32,7 +32,10 @@ int readAveragedADC() {
   for (int i = 0; i < SAMPLE_COUNT; i++) {
     sum += analogRead(SENSOR_PIN);
   }
-  return (int)(sum / SAMPLE_COUNT);
+  int avg = (int)(sum / SAMPLE_COUNT);
+  // Print raw average to serial for calibration (see docs/hardware_setup.md).
+  Serial.printf("raw ADC (avg of %d): %d\n", SAMPLE_COUNT, avg);
+  return avg;
 }
 
 // ---------------------------------------------------------------------------
