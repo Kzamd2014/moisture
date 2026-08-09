@@ -125,18 +125,21 @@ Double-check the three wires before repowering.
 ## Part C — Flash the firmware
 
 1. Open `firmware/moisture/moisture.ino` in the Arduino IDE.
-2. **Set your Wi-Fi credentials.** They live in `secrets.h`, which is git-ignored —
-   this repo is public, so credentials must never go in a tracked file. If you don't
-   have a `secrets.h` yet:
-   ```
-   cd firmware/moisture && cp secrets.h.example secrets.h
-   ```
-   Then edit it (it appears as its own tab in the Arduino IDE, next to the sketch):
+2. **Set your Wi-Fi credentials** near the top of the sketch:
    ```cpp
    const char* WIFI_SSID     = "your-network-name";
    const char* WIFI_PASSWORD = "your-password";
    ```
    Use a **2.4 GHz** network — the ESP32 does not join 5 GHz networks.
+
+   > ⚠️ **This repo is public.** Real credentials in this file must not be committed.
+   > `.githooks/pre-commit` blocks any commit whose staged `moisture.ino` has
+   > non-placeholder credentials. To commit other work meanwhile:
+   > ```
+   > git stash push firmware/moisture/moisture.ino
+   > git commit ...
+   > git stash pop
+   > ```
 3. Leave the calibration constants (`RAW_DRY`, `RAW_WET`) at their defaults for now;
    you'll correct them in Part D.
 4. Upload (same board/port/speed as Part A).

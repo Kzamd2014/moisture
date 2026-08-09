@@ -1,0 +1,22 @@
+#!/bin/bash
+# Update changelog.md after each commit.
+
+MOISTURE_DIR="/home/kzamd22/moisture"
+CHANGELOG="$MOISTURE_DIR/docs/changelog.md"
+LOG="/tmp/update-moisture-docs.log"
+
+echo "[$(date)] Updating changelog after commit" >> "$LOG"
+
+claude -p \
+  --allowedTools "Read,Write,Bash" \
+  --add-dir "$MOISTURE_DIR" \
+  --model haiku \
+  "A new commit was just made to the moisture repo at $MOISTURE_DIR.
+
+Run 'git -C $MOISTURE_DIR log --oneline -20' to see recent commits.
+Update $CHANGELOG with any commits not already listed.
+Format: date header (## YYYY-MM-DD), bullet points for commit messages.
+Do not duplicate existing entries. Do not reformat existing entries." \
+  >> "$LOG" 2>&1 &
+
+echo "[$(date)] Changelog update launched (pid $!)" >> "$LOG"

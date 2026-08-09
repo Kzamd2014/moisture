@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Blocks committing real Wi-Fi credentials to this PUBLIC repo.
+#
+# Credentials live inline in firmware/moisture/moisture.ino by choice. This hook
+# refuses the commit if the staged copy has anything other than the placeholders.
+#
+# Installed via: git config core.hooksPath .githooks
+
+set -euo pipefail
+
+SKETCH="firmware/moisture/moisture.ino"
+
+git diff --cached --name-only | grep -qx "$SKETCH" || exit 0
+
+staged=$(git show ":$SKETCH" 2>/dev/null || true)
+
+ssid=$(printf '%s\n' "$staged" | sed -n 's/^const char\* WIFI_SSID  *= *"\(.*\)".*/\1/p')
+pass=$(printf '%s\n' "$staged" | sed -n 's/^const char\* WIFI_PASSWORD  *= *"\(.*\)".*/\1/p')
+
+fail=0
+[ -n "$ssid" ] && [ "$ssid" != "your-network-name" ] && fail=1
+[ -n "$pass" ] && [ "$pass" != "your-password" ] && fail=1
+
+if [ "$fail" -eq 1 ]; then
+  cat >&2 <<'EOF'
+
+  ✋ COMMIT BLOCKED — real Wi-Fi credentials in firmware/moisture/moisture.ino
+
+  This repo is public. Committing would publish your home network password.
+
+  To commit other work while keeping your credentials locally:
+
+      git stash push firmware/moisture/moisture.ino
+      git commit ...
+      git stash pop
+
+  Or reset just the credential lines to the placeholders before committing.
+
+EOF
+  exit 1
+fi
+
+exit 0

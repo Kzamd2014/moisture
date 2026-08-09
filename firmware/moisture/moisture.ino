@@ -3,11 +3,15 @@
 #include <ESPmDNS.h>
 
 // ---------------------------------------------------------------------------
-// Credentials live in secrets.h, which is git-ignored (this repo is public).
-// First-time setup:  cp secrets.h.example secrets.h  then edit it.
-// Defines WIFI_SSID and WIFI_PASSWORD. Opens as its own tab in the Arduino IDE.
+// Wi-Fi credentials — fill these in before flashing.
+// Must be a 2.4 GHz network; the ESP32 cannot join 5 GHz.
+//
+// ⚠️  This repo is PUBLIC. Once real values are here, do not commit this file.
+//     A pre-commit hook blocks it, but `git commit --no-verify` bypasses that.
+//     To un-stage after editing:  git restore --staged firmware/moisture/moisture.ino
 // ---------------------------------------------------------------------------
-#include "secrets.h"
+const char* WIFI_SSID     = "your-network-name";
+const char* WIFI_PASSWORD = "your-password";
 
 // ---------------------------------------------------------------------------
 // Hardware pin (must be ADC1: GPIO32–39; ADC2 unavailable when Wi-Fi active)
