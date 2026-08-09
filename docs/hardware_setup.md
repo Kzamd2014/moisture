@@ -125,7 +125,13 @@ Double-check the three wires before repowering.
 ## Part C — Flash the firmware
 
 1. Open `firmware/moisture/moisture.ino` in the Arduino IDE.
-2. **Set your Wi-Fi credentials** (lines 8–9):
+2. **Set your Wi-Fi credentials.** They live in `secrets.h`, which is git-ignored —
+   this repo is public, so credentials must never go in a tracked file. If you don't
+   have a `secrets.h` yet:
+   ```
+   cd firmware/moisture && cp secrets.h.example secrets.h
+   ```
+   Then edit it (it appears as its own tab in the Arduino IDE, next to the sketch):
    ```cpp
    const char* WIFI_SSID     = "your-network-name";
    const char* WIFI_PASSWORD = "your-password";

@@ -1,33 +1,9 @@
-.claude/
-.obsidian/
-vault/
-
-# Arduino / C++ build artifacts
-build/
-bin/
-*.o
-*.a
-*.elf
-*.bin
-*.hex
-*.map
-
-# Arduino IDE cache
-.arduino15/
-
-# PlatformIO
-.pio/
-.pioenvs/
-.piolibdeps/
-
-# Credentials — never commit
+# Wi-Fi credentials — never commit (this repo is public)
 firmware/moisture/secrets.h
 
-# macOS
+# Node / Expo (from V1 onward)
+node_modules/
+.expo/
+dist/
+*.log
 .DS_Store
-
-# Editor
-.vscode/
-.idea/
-*.swp
-*.tmp

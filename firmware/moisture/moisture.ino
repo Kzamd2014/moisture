@@ -3,10 +3,11 @@
 #include <ESPmDNS.h>
 
 // ---------------------------------------------------------------------------
-// Credentials — update before flashing
+// Credentials live in secrets.h, which is git-ignored (this repo is public).
+// First-time setup:  cp secrets.h.example secrets.h  then edit it.
+// Defines WIFI_SSID and WIFI_PASSWORD. Opens as its own tab in the Arduino IDE.
 // ---------------------------------------------------------------------------
-const char* WIFI_SSID     = "your-network-name";
-const char* WIFI_PASSWORD = "your-password";
+#include "secrets.h"
 
 // ---------------------------------------------------------------------------
 // Hardware pin (must be ADC1: GPIO32–39; ADC2 unavailable when Wi-Fi active)
