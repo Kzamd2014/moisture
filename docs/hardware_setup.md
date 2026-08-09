@@ -54,9 +54,61 @@ Unplug the USB first (wire with the board powered off).
 | GND | **GND** | any GND pin |
 | AOUT (signal) | **GPIO32** | must be an ADC1 pin (GPIO32–39) |
 
-**Seating the ESP32 on the breadboard:** straddle it across the center gap so each
-pin gets its own row on one side. Don't push it to the far edge or you'll lose the
-rows you need.
+### The three connections
+
+```
+   CAPACITIVE SOIL MOISTURE SENSOR v1.2                    ESP32 DevKit
+   ┌────────────────────────────────────┐
+   │ ░░░░░░░░  exposed probe  ░░░░░░░░  │
+   │ ░░░░░  (this goes in soil)  ░░░░░  │
+   │                                    │
+   │  ──── max waterline ────           │
+   │                                    │
+   │                      ┌────┬────┬────┐
+   └──────────────────────┤AOUT│ GND│ VCC│
+                          └──┬─┴──┬─┴──┬─┘
+                             │    │    │
+                             │    │    └── red ─────────►  3V3
+                             │    │                        (NOT VIN / 5V)
+                             │    └─────── black ────────►  GND
+                             │                              (any GND pin)
+                             └──────────── yellow ───────►  GPIO32
+                                                            (silkscreen may
+                                                             say "D32")
+```
+
+> **Read the silkscreen, don't trust the order above.** Pin order on these generic
+> boards varies between production runs. Each of the three pins is labelled on the
+> sensor PCB right by the header — match by *label*, not by position. Getting VCC
+> and GND swapped is the one mistake that can damage the sensor.
+
+### On the breadboard
+
+Straddle the ESP32 across the center gap so each pin lands in its own 5-hole row.
+If you push it to one side instead, the pins short together down a single row.
+
+```
+        ╔═══════════════════════════════════════════════╗
+        ║  ○ ○ ○ ○ ○   ○ ○ ○ ○ ○   ○ ○ ○ ○ ○   ○ ○ ○ ○  ║
+        ║  ○ ○ ○ ○ ○   ○ ○ ○ ○ ○   ○ ○ ○ ○ ○   ○ ○ ○ ○  ║
+   3V3 ─╫──● ○ ○ ○ ○ ┌───────────────────────┐ ○ ○ ○ ○  ║
+   GND ─╫──● ○ ○ ○ ○ │                       │ ○ ○ ○ ○  ║
+        ║  ○ ○ ○ ○ ○ │        ESP32          │ ○ ○ ○ ○  ║
+        ╠════════════│   (straddles gap)     │══════════╣  ← center gap
+        ║  ○ ○ ○ ○ ○ │                       │ ○ ○ ○ ○  ║
+ GPIO32─╫──● ○ ○ ○ ○ └───────────────────────┘ ○ ○ ○ ○  ║
+        ║  ○ ○ ○ ○ ○   ○ ○ ○ ○ ○   ○ ○ ○ ○ ○   ○ ○ ○ ○  ║
+        ╚═══════════════════════════════════════════════╝
+
+        ● = jumper from the sensor lands in the same row as the ESP32 pin
+```
+
+Each ESP32 pin is electrically joined to the 4 free holes in its row — that's what
+lets you reach it with a jumper. The exact rows depend on where you seat the board;
+what matters is that the sensor wire goes into *the same row* as its target pin.
+
+**Before you plug USB back in, check:** the red wire goes to a pin labelled 3V3
+(not VIN, not 5V), and red and black are not swapped at the sensor end.
 
 > ⚠️ **Power the sensor at 3.3V, never 5V.** The sensor's output voltage scales with
 > its supply. At 5V, AOUT can exceed 3.3V and overrun the ESP32's ADC input range —
