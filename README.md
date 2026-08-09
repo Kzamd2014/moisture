@@ -62,6 +62,25 @@ specs/      Speckit feature specs, plans, and tasks
 
 ## Quickstart
 
+**First, on any fresh clone — install the credential guard:**
+
+```
+git config core.hooksPath .githooks
+```
+
+This repo is **public**, and Wi-Fi credentials are edited directly into
+`firmware/moisture/moisture.ino`. The hooks in `.githooks/` are the only thing
+preventing them from being committed, and `core.hooksPath` lives in `.git/config`,
+which is **not cloned**. Without this command there is no guard.
+
+Optionally, so the guard can catch leaks through any file (pasted serial logs,
+sketch copies), record your real values in a local untracked denylist:
+
+```
+printf '%s\n' 'your-actual-ssid' 'your-actual-password' > .git/secrets-denylist
+chmod 600 .git/secrets-denylist
+```
+
 See [`firmware/README.md`](firmware/README.md) for wiring, flash instructions, and troubleshooting.
 
 See [`docs/hardware_setup.md`](docs/hardware_setup.md) for the ADC calibration procedure.

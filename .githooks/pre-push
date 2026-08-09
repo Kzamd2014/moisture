@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Last gate before anything becomes public and irrevocable.
+#
+# pre-commit is skipped by --no-verify, rebase, cherry-pick, revert and merge.
+# This re-scans everything about to be pushed, however it got into history.
+
+set -euo pipefail
+
+remote_ref=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || echo "")
+range="HEAD"
+[ -n "$remote_ref" ] && range="$remote_ref..HEAD"
+
+diff=$(git diff "$range" -U0 2>/dev/null || git diff HEAD -U0)
+[ -z "$diff" ] && exit 0
+
+fail=0
+reasons=()
+
+# Real credentials must never appear in pushed content.
+DENYLIST="$(git rev-parse --git-dir)/secrets-denylist"
+if [ -s "$DENYLIST" ] && grep -Ff "$DENYLIST" -q <<<"$diff"; then
+  fail=1; reasons+=("a literal from .git/secrets-denylist appears in commits about to be pushed")
+fi
+
+# The sketch in every outgoing commit must still hold placeholders.
+for sha in $(git rev-list "$range" 2>/dev/null); do
+  blob=$(git show "$sha:firmware/moisture/moisture.ino" 2>/dev/null || true)
+  [ -z "$blob" ] && continue
+  if ! grep -qF '"your-network-name"' <<<"$blob" || ! grep -qF '"your-password"' <<<"$blob"; then
+    fail=1; reasons+=("commit ${sha:0:7} has non-placeholder credentials in moisture.ino")
+  fi
+done
+
+if [ "$fail" -eq 1 ]; then
+  {
+    echo
+    echo "  ✋ PUSH BLOCKED — credential leak in outgoing commits"
+    echo
+    for r in "${reasons[@]}"; do echo "     • $r"; done
+    echo
+    echo "  Once pushed to a public repo this cannot be undone — assume scraped."
+    echo "  Fix the offending commit (git rebase -i / git commit --amend) first."
+    echo
+  } >&2
+  exit 1
+fi
+
+exit 0

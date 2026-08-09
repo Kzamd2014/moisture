@@ -133,13 +133,23 @@ Double-check the three wires before repowering.
    Use a **2.4 GHz** network — the ESP32 does not join 5 GHz networks.
 
    > ⚠️ **This repo is public.** Real credentials in this file must not be committed.
-   > `.githooks/pre-commit` blocks any commit whose staged `moisture.ino` has
-   > non-placeholder credentials. To commit other work meanwhile:
+   > Confirm the guard is installed (it is not automatic on a fresh clone):
+   > ```
+   > git config core.hooksPath .githooks
+   > ```
+   > `.githooks/pre-commit` then blocks any commit whose staged `moisture.ino` is
+   > missing the placeholders, and `.githooks/pre-push` re-checks every outgoing
+   > commit. To commit other work meanwhile:
    > ```
    > git stash push firmware/moisture/moisture.ino
    > git commit ...
    > git stash pop
    > ```
+
+   > ⚠️ **Careful pasting serial output.** The firmware prints
+   > `Connecting to <your-SSID>` on boot. Don't paste that first line into docs,
+   > issues, or a chat — the heartbeat lines below it are the only part needed for
+   > calibration.
 3. Leave the calibration constants (`RAW_DRY`, `RAW_WET`) at their defaults for now;
    you'll correct them in Part D.
 4. Upload (same board/port/speed as Part A).

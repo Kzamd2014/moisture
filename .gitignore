@@ -1,9 +1,45 @@
-# Wi-Fi credentials — never commit (this repo is public)
+# === Credentials =============================================================
+# This repo is PUBLIC. Real Wi-Fi credentials live only in the working copy of
+# firmware/moisture/moisture.ino and are enforced by .githooks/pre-commit.
 firmware/moisture/secrets.h
+.env
+.env.*
+!.env.example
 
-# Node / Expo (from V1 onward)
+# === Arduino build output ====================================================
+# A compiled .bin contains WIFI_PASSWORD as a plaintext string — never commit.
+# Arduino IDE "Export Compiled Binary" writes into the sketch folder.
+build/
+*.bin
+*.elf
+*.hex
+*.ino.bak
+*~
+
+# === Local agent config ======================================================
+.claude/settings.local.json
+
+# === Node / Expo (V1 onward) =================================================
 node_modules/
 .expo/
 dist/
+web-build/
+*.jsbundle
 *.log
 .DS_Store
+
+# === Native build + signing material (bare workflow at V2) ===================
+ios/Pods/
+ios/build/
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist

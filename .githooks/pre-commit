@@ -1,42 +1,72 @@
 #!/usr/bin/env bash
 # Blocks committing real Wi-Fi credentials to this PUBLIC repo.
 #
-# Credentials live inline in firmware/moisture/moisture.ino by choice. This hook
-# refuses the commit if the staged copy has anything other than the placeholders.
+# Install (NOT automatic on a fresh clone — .git/config is not cloned):
+#     git config core.hooksPath .githooks
 #
-# Installed via: git config core.hooksPath .githooks
+# Design note: this hook FAILS CLOSED. It requires positive proof that the
+# placeholders are present. An unparseable, renamed, or reformatted sketch is
+# treated as a leak, not as "nothing found". The previous version inferred
+# safety from a regex not matching, which silently disarmed on whitespace or
+# pointer-style changes (e.g. Arduino IDE Auto-Format turning `char* X` into
+# `char *X`).
 
 set -euo pipefail
 
 SKETCH="firmware/moisture/moisture.ino"
+PLACEHOLDER_SSID='"your-network-name"'
+PLACEHOLDER_PASS='"your-password"'
 
-git diff --cached --name-only | grep -qx "$SKETCH" || exit 0
-
-staged=$(git show ":$SKETCH" 2>/dev/null || true)
-
-ssid=$(printf '%s\n' "$staged" | sed -n 's/^const char\* WIFI_SSID  *= *"\(.*\)".*/\1/p')
-pass=$(printf '%s\n' "$staged" | sed -n 's/^const char\* WIFI_PASSWORD  *= *"\(.*\)".*/\1/p')
+staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged_files" ] && exit 0
 
 fail=0
-[ -n "$ssid" ] && [ "$ssid" != "your-network-name" ] && fail=1
-[ -n "$pass" ] && [ "$pass" != "your-password" ] && fail=1
+reasons=()
+
+# --- Check 1: the sketch must still hold both placeholders -------------------
+if grep -qx "$SKETCH" <<<"$staged_files"; then
+  staged=$(git show ":$SKETCH")
+
+  if ! grep -qF "$PLACEHOLDER_SSID" <<<"$staged"; then
+    fail=1; reasons+=("$SKETCH does not contain the placeholder SSID $PLACEHOLDER_SSID")
+  fi
+  if ! grep -qF "$PLACEHOLDER_PASS" <<<"$staged"; then
+    fail=1; reasons+=("$SKETCH does not contain the placeholder password $PLACEHOLDER_PASS")
+  fi
+fi
+
+# --- Check 2: no build output (compiled .bin embeds the PSK in cleartext) ----
+if grep -qE '(^|/)build/|\.(bin|elf|hex)$' <<<"$staged_files"; then
+  fail=1; reasons+=("build output staged — compiled binaries contain WIFI_PASSWORD as a plaintext string")
+fi
+
+# --- Check 3: optional denylist of literal secrets, scanned across ALL files -
+# Create .git/secrets-denylist (untracked, never cloned), one literal per line,
+# holding your real SSID and password. Catches leaks via any path: serial logs
+# pasted into docs, sketch copies, editor backups.
+DENYLIST="$(git rev-parse --git-dir)/secrets-denylist"
+if [ -s "$DENYLIST" ]; then
+  if git diff --cached -U0 | grep -Ff "$DENYLIST" -q; then
+    fail=1; reasons+=("a literal from .git/secrets-denylist appears in the staged diff")
+  fi
+fi
 
 if [ "$fail" -eq 1 ]; then
-  cat >&2 <<'EOF'
-
-  ✋ COMMIT BLOCKED — real Wi-Fi credentials in firmware/moisture/moisture.ino
-
-  This repo is public. Committing would publish your home network password.
-
-  To commit other work while keeping your credentials locally:
-
-      git stash push firmware/moisture/moisture.ino
-      git commit ...
-      git stash pop
-
-  Or reset just the credential lines to the placeholders before committing.
-
-EOF
+  {
+    echo
+    echo "  ✋ COMMIT BLOCKED — possible credential leak"
+    echo
+    for r in "${reasons[@]}"; do echo "     • $r"; done
+    echo
+    echo "  This repo is PUBLIC (github.com/Kzamd2014/moisture)."
+    echo
+    echo "  To commit other work while keeping your credentials locally:"
+    echo
+    echo "      git stash push $SKETCH"
+    echo "      git commit ..."
+    echo "      git stash pop"
+    echo
+  } >&2
   exit 1
 fi
 
