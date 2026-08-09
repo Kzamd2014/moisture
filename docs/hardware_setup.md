@@ -91,19 +91,34 @@ Double-check the three wires before repowering.
    ```
    Note the IP address — it's your fallback if `esp32.local` doesn't resolve.
 
-If it never gets past `Connecting...`, the SSID/password is wrong or the network is
-5 GHz.
+   Below that, a reading prints once per second — this is the calibration heartbeat
+   you'll use in Part D:
+   ```
+   raw ADC (avg of 10): 2887  ->  1%
+   ```
+
+If Wi-Fi fails, the firmware waits 15 seconds, says so, and **carries on anyway**:
+
+```
+Wi-Fi failed (check SSID/password, and that it's 2.4 GHz).
+Continuing without networking — sensor readings below still valid.
+raw ADC (avg of 10): 2887  ->  1%
+```
+
+That's deliberate — you can confirm your wiring is right (Part D) without having
+solved Wi-Fi first. Only Part E needs the network.
 
 ---
 
 ## Part D — Calibrate
 
 The sensor's raw ADC value must be mapped to 0–100%, and the endpoints depend on your
-specific unit. The firmware prints the raw averaged value to Serial Monitor on every
-reading, so calibration is just "trigger a read, read the number."
+specific unit. The firmware prints a reading to Serial Monitor once per second, so
+calibration is just "hold the sensor still, watch the numbers settle, write one down."
 
-To trigger a read, open the endpoint in a browser or curl it (see Part E), or just
-watch the serial output as you move the sensor.
+**Sanity check first:** with the sensor in open air, the raw value should sit somewhere
+in the 2500–3200 range and stay steady. If it reads 0 or 4095, or jumps around wildly,
+stop and recheck the wiring from Part B before calibrating.
 
 1. **Dry reading (`RAW_DRY`):** hold the sensor in **open air**. Take ~10 readings
    from the serial log, average them. Expected ballpark ~2900.

@@ -10,7 +10,7 @@
 
 ### Phase 0: Pre-sprint (before hardware arrives)
 - [x] Scaffold `/firmware/moisture.ino` skeleton
-- [ ] Test Arduino IDE — flash blink sketch, confirm USB drivers + board selection work
+- [x] Test Arduino IDE — flash blink sketch, confirm USB drivers + board selection work (2026-08-08, Part A ✅)
 - [ ] Scaffold `/app` with `npx create-expo-app app`
 
 ### Phase 1: Hardware bring-up (Days 1–2)
